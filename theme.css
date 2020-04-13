@@ -1,0 +1,25 @@
+.content {
+    font-family: sans-serif;
+}
+
+@media (orientation: landscape) {
+    .content {
+        max-width: 50%;
+        margin: auto;
+    }
+    .step-container {
+        display: grid;
+        grid-template-columns: [main-start] auto [main-end ing-col-start] 30% [ing-col-end];
+        grid-template-rows: auto;
+    }
+    .step-ingredients {
+        grid-column: ing-col-start / ing-col-end;
+        grid-row: 1 / span 1;
+    }
+    .step-description {
+        grid-column: main-start / main-end;
+        grid-row: 1 / span 1;
+    }
+}
+@media (orientation: portrait) {
+}
