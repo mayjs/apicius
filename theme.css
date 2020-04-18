@@ -2,6 +2,19 @@
     font-family: sans-serif;
 }
 
+ul.tags-list {
+    list-style-type: none;
+}
+
+.tag {
+    float: left;
+    margin-right: 1em;
+    padding: .5em;
+    background: #007bff;
+    color: white;
+    border-radius: 1em;
+}
+
 @media (orientation: landscape) {
     .content {
         max-width: 50%;

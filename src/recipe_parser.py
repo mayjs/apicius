@@ -59,6 +59,23 @@ def _build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     section.extend((heading, list_tag, multiplier))
     return section
 
+def _sectionize_from_heading(soup, tag):
+    def heading_level(tag):
+        if tag is None:
+            return 0
+        match = re.match(r"h(\d)", tag.name)
+        if match is None:
+            return float("inf")
+        return int(match.group(1))
+
+    level = heading_level(tag)
+    wrapper = soup.new_tag("section", id=tag.string)
+    tag.wrap(wrapper)
+    while not heading_level(sibling := wrapper.findNextSibling()) <= level:
+        sibling.wrap(wrapper)
+    return wrapper
+
+
 
 def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
     """
@@ -99,12 +116,9 @@ def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
                     item.contents.clear()
                     _populate_tag_with_ingredient(soup, item, match.group("number"), match.group("unit"), match.group("name"))
                     ingredient_summary[(match.group("name"), match.group("unit"))] += float(match.group("number") or 0)
-        wrapping_div = soup.new_tag("div", **{"class": ["step-container"]})
-        thing = step.findNextSibling()
-        while thing is not None and thing != nextPart and (next is None or soup.index(thing) < soup.index(next)):
-            new_thing = thing.findNextSibling()
-            thing.wrap(wrapping_div)
-            thing = new_thing
+
+        wrapping_div = _sectionize_from_heading(soup, step)
+        _add_classes(wrapping_div, "step-container")
         desc_div = soup.new_tag("div", **{"class": ["step-description"]})
         for el in ingredients.findNextSiblings(): # TODO: Ingredients is None
             el.wrap(desc_div)
@@ -112,9 +126,22 @@ def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
     summary_tag = _build_summary(soup, ingredient_summary)
     steps.insert_before(summary_tag)
 
+    tags = set()
+    tags_el = soup.find("h2", text="Schlagwörter")
+    if tags_el is None:
+        tags_el = soup.find("h2", text="Tags")
+    if tags_el is not None:
+        tags_section = _sectionize_from_heading(soup, tags_el)
+        _add_classes(tags_section, "tags")
+        for ul in tags_section.findChildren("ul"):
+            _add_classes(ul, "tags-list")
+            for li in ul.findChildren("li"):
+                _add_classes(li, "tag")
+                tags.add(li.string)
+
     html_out = html_template.format(body=soup.prettify(), js_path_prefix=js_path_prefix, css_path_prefix=css_path_prefix)
 
-    return soup.h1.text, ingredient_summary, html_out
+    return soup.h1.text, ingredient_summary, tags, html_out
 
 
 
@@ -123,5 +150,5 @@ if __name__ == "__main__":
     parser.add_argument("file", type=FileType(), help="A markdown file to read")
 
     args = parser.parse_args()
-    title, ingredients, html = parse_and_render_recipe(args.file.read())
+    title, ingredients, tags, html = parse_and_render_recipe(args.file.read())
     print(html)
