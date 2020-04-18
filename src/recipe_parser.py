@@ -16,7 +16,7 @@ def _add_classes(tag, *args):
 
 def populate_tag_with_ingredient(soup, parent, number, unit, name):
     if number:
-        number_tag = soup.new_tag("span", **{"class": ["ingredient-number"]})
+        number_tag = soup.new_tag("span", **{"class": ["ingredient-number"], "data-default-amount": str(number)})
         number_tag.string = str(float(number)).rstrip("0").rstrip(".")
         unit_tag = soup.new_tag("span", **{"class": ["ingredient-unit"]})
         unit_tag.string = unit
@@ -32,11 +32,11 @@ def build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     list_tag = soup.new_tag("ul")
     _add_classes(list_tag, "ingredients", "summarized-ingredients")
 
-    specific_ingredients   = [(name, unit, number) for ((name,unit),number) in ingredient_dict.items() if number != 0]
-    unspecific_ingredients = [(name, unit, number) for ((name,unit),number) in ingredient_dict.items() if number == 0]
-    specific_ingredients = sorted(specific_ingredients, key=lambda x: x[0]) # Sort by name
-    unspecific_ingredients = sorted(unspecific_ingredients, key=lambda x: x[0]) # Sort by name
-    for name, unit, number in itertools.chain(specific_ingredients, unspecific_ingredients):
+    # We sort ingredients on two keys: First of all we want to group ingredients with specific amounts and ingredients without specific amounts.
+    # Within those groups we use the name of the ingredient.
+    ingredients = sorted([(name, unit, number) for ((name,unit),number) in ingredient_dict.items()],
+                         key=lambda x:(x[2]==0, x[0].lower()))
+    for name, unit, number in ingredients:
         li = soup.new_tag("li")
         _add_classes(li, "ingredient")
         populate_tag_with_ingredient(soup, li, number, unit, name)
@@ -45,8 +45,17 @@ def build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     heading = soup.new_tag("h2")
     heading.string = "Zutaten"
 
+    multiplier = soup.new_tag("form")
+    _add_classes(multiplier, "multiplier-form")
+    inp = soup.new_tag("input", type="number", step="any", value="1", id="multiplier-input")
+    _add_classes(inp, "multiplier-input")
+    btn = soup.new_tag("button", type="button", onclick="scaleIngredients();")
+    btn.string = "Umrechnen"
+    _add_classes(btn, "multiplier-submit")
+    multiplier.extend((inp, btn))
+
     section = soup.new_tag("section")
-    section.extend((heading, list_tag))
+    section.extend((heading, list_tag, multiplier))
     return section
 
 
