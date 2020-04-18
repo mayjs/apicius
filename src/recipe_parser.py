@@ -49,7 +49,7 @@ def build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     _add_classes(multiplier, "multiplier-form")
     label = soup.new_tag("label", **{"for": "multiplier-input"})
     label.string = "Multiplikator:"
-    inp = soup.new_tag("input", type="number", step="any", value="1", id="multiplier-input")
+    inp = soup.new_tag("input", type="number", step="any", min="0", value="1", id="multiplier-input")
     _add_classes(inp, "multiplier-input")
     btn = soup.new_tag("button", type="button", onclick="scaleIngredients();")
     btn.string = "Umrechnen"
