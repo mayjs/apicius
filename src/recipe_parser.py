@@ -60,7 +60,7 @@ def _build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     return section
 
 
-def parse_and_render_recipe(input):
+def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
     """
     Parse a recipe from markdown
 
@@ -112,7 +112,7 @@ def parse_and_render_recipe(input):
     summary_tag = _build_summary(soup, ingredient_summary)
     steps.insert_before(summary_tag)
 
-    html_out = html_template.format(body=soup.prettify())
+    html_out = html_template.format(body=soup.prettify(), js_path_prefix=js_path_prefix, css_path_prefix=css_path_prefix)
 
     return soup.h1.text, ingredient_summary, html_out
 
