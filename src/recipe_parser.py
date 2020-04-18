@@ -1,4 +1,3 @@
-from recipe import Ingredient, Quantity, Step, Recipe
 import commonmark
 from argparse import ArgumentParser, FileType
 from bs4 import BeautifulSoup
@@ -14,7 +13,7 @@ with open(os.path.join(os.path.dirname(__file__), 'html_template.html')) as f:
 def _add_classes(tag, *args):
     tag['class'] = tag.get("class", []) + list(args)
 
-def populate_tag_with_ingredient(soup, parent, number, unit, name):
+def _populate_tag_with_ingredient(soup, parent, number, unit, name):
     if number:
         number_tag = soup.new_tag("span", **{"class": ["ingredient-number"], "data-default-amount": str(number)})
         number_tag.string = str(float(number)).rstrip("0").rstrip(".")
@@ -25,7 +24,7 @@ def populate_tag_with_ingredient(soup, parent, number, unit, name):
     name_tag.string = name
     parent.append(name_tag)
 
-def build_summary(soup: BeautifulSoup, ingredient_dict: dict):
+def _build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     """
     Builds a html summary of ingredients as a list
     """
@@ -39,7 +38,7 @@ def build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     for name, unit, number in ingredients:
         li = soup.new_tag("li")
         _add_classes(li, "ingredient")
-        populate_tag_with_ingredient(soup, li, number, unit, name)
+        _populate_tag_with_ingredient(soup, li, number, unit, name)
         list_tag.append(li)
 
     heading = soup.new_tag("h2")
@@ -61,7 +60,7 @@ def build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     return section
 
 
-def parse_recipe(input):
+def parse_and_render_recipe(input):
     """
     Parse a recipe from markdown
 
@@ -75,7 +74,6 @@ def parse_recipe(input):
     html = renderer.render(ast)
     soup = BeautifulSoup(html, 'html.parser')
     # print(soup.prettify())
-    recipe = Recipe(soup.h1.text)
     steps = soup.find("h2", text="Zubereitung")
 
     if (nextPart := steps.findNextSibling("h2")) is not None:
@@ -99,7 +97,7 @@ def parse_recipe(input):
                     print(f"warning: could not parse ingredient {item.text}", file=sys.stderr)
                 else:
                     item.contents.clear()
-                    populate_tag_with_ingredient(soup, item, match.group("number"), match.group("unit"), match.group("name"))
+                    _populate_tag_with_ingredient(soup, item, match.group("number"), match.group("unit"), match.group("name"))
                     ingredient_summary[(match.group("name"), match.group("unit"))] += float(match.group("number") or 0)
         wrapping_div = soup.new_tag("div", **{"class": ["step-container"]})
         thing = step.findNextSibling()
@@ -111,10 +109,12 @@ def parse_recipe(input):
         for el in ingredients.findNextSiblings(): # TODO: Ingredients is None
             el.wrap(desc_div)
 
-    summary_tag = build_summary(soup, ingredient_summary)
+    summary_tag = _build_summary(soup, ingredient_summary)
     steps.insert_before(summary_tag)
 
-    print(html_template.format(body=soup.prettify()))
+    html_out = html_template.format(body=soup.prettify())
+
+    return soup.h1.text, ingredient_summary, html_out
 
 
 
@@ -123,4 +123,5 @@ if __name__ == "__main__":
     parser.add_argument("file", type=FileType(), help="A markdown file to read")
 
     args = parser.parse_args()
-    parse_recipe(args.file.read())
+    title, ingredients, html = parse_and_render_recipe(args.file.read())
+    print(html)
