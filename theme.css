@@ -17,6 +17,9 @@ a:hover {
 .search-form label {
     display: none;
 }
+.search-hidden {
+    display: none;
+}
 
 /* Tag bubbles */
 ul.tags-list {

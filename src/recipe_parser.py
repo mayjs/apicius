@@ -44,11 +44,11 @@ def _build_summary(soup: BeautifulSoup, ingredient_dict: dict):
     heading = soup.new_tag("h2")
     heading.string = "Zutaten"
 
-    multiplier = soup.new_tag("form")
+    multiplier = soup.new_tag("form", onsubmit="scaleIngredients(); event.preventDefault();")
     _add_classes(multiplier, "multiplier-form")
     label = soup.new_tag("label", **{"for": "multiplier-input"})
     label.string = "Multiplikator:"
-    inp = soup.new_tag("input", type="number", step="any", min="0", value="1", id="multiplier-input")
+    inp = soup.new_tag("input", type="number", step="any", min="0", value="1", id="multiplier-input", oninput="scaleIngredients();")
     _add_classes(inp, "multiplier-input")
     btn = soup.new_tag("button", type="button", onclick="scaleIngredients();")
     btn.string = "Umrechnen"

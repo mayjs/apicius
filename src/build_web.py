@@ -9,7 +9,7 @@ def render_table_row(title, ingredients, tags, url):
         "\n".join(f'<li class="tag">{tag}</li>' for tag in tags)
     )
     template = f"""
-        <tr>
+        <tr class="recipe-row" data-tags="{" ".join(tags)}" data-title="{title}" data-ingredients="{" ".join(ingredients)}">
             <td><a href="{url}">{title}</a></td>
             <td>{rendered_tags}</td>
         </tr>
@@ -44,9 +44,9 @@ def build(source: Path, dest: Path):
     nl = "\n"
     body = f"""
         <h2>Rezept-Übersicht:</h2>
-        <form class="search-form">
+        <form class="search-form" onsubmit="search(); event.preventDefault();">
             <label for="search-input">Suche:</label>
-            <input class="search-input" id="search-input" type="Suche" placeholder="Suche">
+            <input class="search-input" id="search-input" type="Suche" placeholder="Suche" oninput="searchTermChanged();" value="">
             <button class="search-submit" onclick="search();" type="button">
             Suchen
             </button>
