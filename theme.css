@@ -1,20 +1,60 @@
+/* Global font */
 .content {
     font-family: sans-serif;
 }
 
+/* Better looking anchors */
+a {
+    color: black;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Search form */
+.search-form label {
+    display: none;
+}
+
+/* Tag bubbles */
 ul.tags-list {
     list-style-type: none;
+    margin: 0;
+    padding: 0;
 }
 
 .tag {
     float: left;
+    display: inline-block;
     margin-right: 1em;
     padding: .5em;
     background: #007bff;
     color: white;
     border-radius: 1em;
+    font-size: 0.8em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
+.tag:last-child {
+    margin-right: 0;
+}
+
+/* Make all tables striped and hoverable */
+td, th{
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+tr:hover {
+    background-color: #ddd;
+}
+
+/* Media dependent grid layout */
 @media (orientation: landscape) {
     .content {
         max-width: 50%;
