@@ -1,0 +1,7 @@
+{
+    "port": 8099,
+    "push_path": "/SECRET/push",
+    "github_secret": "SECRET2",
+    "src_path": "/path/to/markdown_dir",
+    "dest_path": "/path/to/http/root_dir"
+}

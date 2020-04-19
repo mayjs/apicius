@@ -10,6 +10,7 @@ commonmark = "*"
 python-language-server = "*"
 pdbpp = "*"
 beautifulsoup4 = "*"
+werkzeug = "*"
 
 [requires]
 python_version = "3.8"
