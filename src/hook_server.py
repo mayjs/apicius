@@ -18,9 +18,11 @@ if __name__ == '__main__':
         if "X-Hub-Signature" not in request.headers:
             return Response("Invalid request", status=400)
         # TODO: Check content length before getting data
-        content = request.data()
-        correct_secret = hmac.digest(config["github_secret"], content, "sha1")
-        if request.headers["X-Hub-Signature"] != correct_secret:
+        content = request.data
+        correct_secret = hmac.digest(config["github_secret"].encode(), content, "sha1").hex()
+        sent_secret = request.headers["X-Hub-Signature"].split("=")[1] # We could parse the used digest in front of the equals sign
+
+        if sent_secret != correct_secret:
             return Response("Invalid request", status=400)
 
         # Secret looks good, we could now check the body, but let's keep it simple and just trigger a pull and rebuild
@@ -28,4 +30,4 @@ if __name__ == '__main__':
         return Response()
 
     from werkzeug.serving import run_simple
-    run_simple('localhost', config["port"], application)
+    run_simple('0.0.0.0', config["port"], application)
