@@ -21,7 +21,6 @@ if __name__ == '__main__':
         content = request.data
         correct_secret = hmac.digest(config["github_secret"].encode(), content, "sha1").hex()
         sent_secret = request.headers["X-Hub-Signature"].split("=")[1] # We could parse the used digest in front of the equals sign
-
         if sent_secret != correct_secret:
             return Response("Invalid request", status=400)
 
@@ -30,4 +29,4 @@ if __name__ == '__main__':
         return Response()
 
     from werkzeug.serving import run_simple
-    run_simple('0.0.0.0', config["port"], application)
+    run_simple('127.0.0.1', config["port"], application)
