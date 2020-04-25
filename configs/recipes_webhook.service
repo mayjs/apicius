@@ -1,0 +1,14 @@
+[Unit]
+Description=Recipes github webhook server
+Before=nginx.service
+
+[Service]
+WorkingDirectory=PATHTO_SRC
+ExecStart=PATHTO_SRC/run_hook_server.sh
+User=USER
+Group=USER
+Restart=on-failure
+RestartPreventExitStatus=255
+
+[Install]
+WantedBy=multi-user.target
