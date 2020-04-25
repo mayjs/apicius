@@ -70,11 +70,11 @@ tr:hover {
     }
     .step-ingredients {
         grid-column: ing-col-start / ing-col-end;
-        grid-row: 1 / span 1;
+        grid-row: 2 / span 1;
     }
     .step-description {
         grid-column: main-start / main-end;
-        grid-row: 1 / span 1;
+        grid-row: 2 / span 1;
     }
 }
 @media (orientation: portrait) {
