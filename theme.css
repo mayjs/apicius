@@ -79,3 +79,7 @@ tr:hover {
 }
 @media (orientation: portrait) {
 }
+
+h1, h2, h3 {
+    clear: left;
+}
