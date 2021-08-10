@@ -59,7 +59,7 @@ def build(source: Path, dest: Path):
         {nl.join(table_rows)}
     </table>
     """
-    html = html_template.format(body=body, css_path_prefix="", js_path_prefix="")
+    html = html_template.format(body=body, css_path_prefix="", js_path_prefix="", title="Kochrezepte")
     (dest / "index.html").write_text(html)
 
 def main():

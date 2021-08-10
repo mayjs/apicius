@@ -75,6 +75,46 @@ def _sectionize_from_heading(soup, tag):
         sibling.wrap(wrapper)
     return wrapper
 
+def _make_slideshows(soup):
+    for ss_idx, first_img in enumerate(soup.select("ul>li:first-child>img")):
+        ss_wrapper = first_img.parent.parent
+        ss_wrapper.name = "div"
+        ss_wrapper.id = f"slideshow-{ss_idx}"
+        _add_classes(ss_wrapper, "slideshow-container")
+        items = ss_wrapper.find_all("li")
+        for idx, item in enumerate(items):
+            item.name = "div"
+            _add_classes(item, "slideshow-card", "fade")
+            counter = soup.new_tag("div")
+            _add_classes(counter, "slideshow-number")
+            counter.string = f"{idx+1} / {len(items)}"
+            item.insert(0, counter)
+
+            img = item.find("img")
+            if img is not None:
+                img.style = "width:100%"
+
+        btn_prev = soup.new_tag("a")
+        _add_classes(btn_prev, "slideshow-prev")
+        btn_prev["onclick"] = f"slideshowJump(-1, {ss_idx})"
+        btn_prev.string = "❮"
+
+        btn_next = soup.new_tag("a")
+        _add_classes(btn_next, "slideshow-next")
+        btn_next["onclick"] = f"slideshowJump(1, {ss_idx})"
+        btn_next.string = "❯"
+
+        ss_wrapper.append(btn_prev)
+        ss_wrapper.append(btn_next)
+
+        dots = soup.new_tag("div")
+        _add_classes(dots, "slideshow-dots")
+        for i in range(len(items)):
+            dot = soup.new_tag("span")
+            _add_classes(dot, "slideshow-dot")
+            dot["onclick"]=f"slideshowShow({i+1}, {ss_idx})"
+            dots.append(dot)
+        ss_wrapper.insert_after(dots)
 
 
 def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
@@ -139,9 +179,12 @@ def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
                 _add_classes(li, "tag")
                 tags.add(li.string)
 
-    html_out = html_template.format(body=soup.prettify(), js_path_prefix=js_path_prefix, css_path_prefix=css_path_prefix)
+    _make_slideshows(soup)
 
-    return soup.h1.text, ingredient_summary, tags, html_out
+    title = soup.h1.text
+    html_out = html_template.format(body=soup.prettify(), js_path_prefix=js_path_prefix, css_path_prefix=css_path_prefix, title=title)
+
+    return title, ingredient_summary, tags, html_out
 
 
 

@@ -28,3 +28,47 @@ function search() {
 function searchTermChanged() {
     search();
 }
+
+/* Slideshow logic strongly inspired from https://www.w3schools.com/howto/howto_js_slideshow.asp */
+var slideIndex = null;
+function slideshowShow(img_idx, slideshow_idx) {
+  slideshows = document.getElementsByClassName("slideshow-container");
+
+  selectedSlideshow = slideshows[slideshow_idx];
+  images = selectedSlideshow.getElementsByClassName("slideshow-card");
+  if(img_idx > images.length) {
+    slideIndex[slideshow_idx] = 1;
+  } else if(img_idx < 1) {
+    slideIndex[slideshow_idx] = images.length;
+  } else {
+    slideIndex[slideshow_idx] = img_idx;
+  }
+  for(let i = 0; i < images.length; i++) {
+    images[i].style.display = "none";
+  }
+  images[slideIndex[slideshow_idx]-1].style.display = "block";
+
+  dots = document.getElementsByClassName("slideshow-dots")[slideshow_idx].getElementsByClassName("slideshow-dot");
+  for (let i = 0; i < dots.length; i++) {
+    dots[i].className = dots[i].className.replace(" slideshow-dot-active", "");
+  }
+  dots[slideIndex[slideshow_idx]-1].className += " slideshow-dot-active";
+}
+
+function slideshowInit() {
+  slideshows = document.getElementsByClassName("slideshow-container").length;
+  slideIndex = new Array(slideshows).fill(1);
+
+  for(let si = 0; si < slideshows; si++) {
+    console.log(si + " from " + slideshows);
+    slideshowShow(1, si);
+  }
+}
+
+function slideshowJump(jump, slideshow) {
+  slideshowShow(slideIndex[slideshow] + jump, slideshow);
+}
+
+window.onload = function() {
+  slideshowInit();
+}
