@@ -132,10 +132,11 @@ button:hover {
 }
 
 input {
-    border: none;
     border-radius: 5px;
     padding: 5px;
     background-color: var(--input-bg);
+    display: inline-block;
+    border: 1px solid var(--hover-color);
 }
 
 /* Carousel slideshow things, taken from https://www.w3schools.com/howto/howto_js_slideshow.asp */
