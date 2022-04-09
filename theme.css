@@ -1,3 +1,34 @@
+:root {
+    --primary-color: green;
+    --secondary-color: #007bff;
+    --hover-brightness: 1.2;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #ebf2fa;
+        --background-color: #111;
+        --hover-color: #555;
+        --table-stripe-color: #333;
+        --input-bg: #ddd;
+    }
+}
+
+@media not all and (prefers-color-scheme: dark) {
+    :root {
+        --text-color: black;
+        --background-color: white;
+        --hover-color: #ddd;
+        --table-stripe-color: #f2f2f2;
+        --input-bg: white;
+    }
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
 /* Global font */
 .content {
     font-family: sans-serif;
@@ -5,7 +36,7 @@
 
 /* Better looking anchors */
 a {
-    color: black;
+    color: var(--text-color);
     text-decoration: none;
 }
 
@@ -33,7 +64,7 @@ ul.tags-list {
     display: inline-block;
     margin-right: 1em;
     padding: .5em;
-    background: #007bff;
+    background: var(--secondary-color);
     color: white;
     border-radius: 1em;
     font-size: 0.8em;
@@ -47,14 +78,15 @@ ul.tags-list {
 
 /* Make all tables striped and hoverable */
 td, th{
-    border: 1px solid #ddd;
+    border: 1px solid var(--hover-color);
     padding: 8px;
 }
+
 tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: var(--table-stripe-color);
 }
 tr:hover {
-    background-color: #ddd;
+    background-color: var(--hover-color);
 }
 
 /* Media dependent grid layout */
@@ -82,6 +114,28 @@ tr:hover {
 
 h1, h2, h3 {
     clear: left;
+}
+
+/* Forms */
+button {
+    background-color: var(--primary-color);
+    padding: 5px;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(var(--hover-brightness));
+}
+
+input {
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: var(--input-bg);
 }
 
 /* Carousel slideshow things, taken from https://www.w3schools.com/howto/howto_js_slideshow.asp */
