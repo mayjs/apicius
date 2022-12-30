@@ -49,6 +49,15 @@
             mainProgram = "${executable_name}";
           };
         };
+        packages.apicius_default_theme = pkgs.stdenv.mkDerivation {
+          pname = "apicius_default_theme";
+          version = "2022-12-30";
+          src = ./.;
+          installPhase = ''
+            mkdir -p $out
+            cp script.js theme.css $out
+          '';
+        };
         packages.default = self.packages.${system}.apicius_app;
 
         hydraJobs.apicius_app = self.packages.${system}.default;
