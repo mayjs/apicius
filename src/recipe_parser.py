@@ -143,25 +143,31 @@ def parse_and_render_recipe(input, js_path_prefix="", css_path_prefix=""):
         if soup.index(step) >= steps_upto:
             break
         next = step.findNextSibling("h3")
-        ingredients = step.findNextSibling("ul") # TODO: Handle ingredients is None
-        if next is None or soup.index(ingredients) < soup.index(next):
-            _add_classes(ingredients, "ingredients", "step-ingredients")
-            # Collect ingredients
-            for item in ingredients.findChildren("li"):
-                _add_classes(item, "ingredient")
-                match = re.match(r"^(?P<amount>(?P<number>[\d\.]+)(?P<unit>\S*))?\s*(?P<name>.*)$", item.text)
-                if not match:
-                    print(f"warning: could not parse ingredient {item.text}", file=sys.stderr)
-                else:
-                    item.contents.clear()
-                    _populate_tag_with_ingredient(soup, item, match.group("number"), match.group("unit"), match.group("name"))
-                    ingredient_summary[(match.group("name"), match.group("unit"))] += float(match.group("number") or 0)
+        ingredients = step.findNextSibling("ul")
+        if ingredients is not None:
+            if next is None or soup.index(ingredients) < soup.index(next):
+                _add_classes(ingredients, "ingredients", "step-ingredients")
+                # Collect ingredients
+                for item in ingredients.findChildren("li"):
+                    _add_classes(item, "ingredient")
+                    match = re.match(r"^(?P<amount>(?P<number>[\d\.]+)(?P<unit>\S*))?\s*(?P<name>.*)$", item.text)
+                    if not match:
+                        print(f"warning: could not parse ingredient {item.text}", file=sys.stderr)
+                    else:
+                        item.contents.clear()
+                        _populate_tag_with_ingredient(soup, item, match.group("number"), match.group("unit"), match.group("name"))
+                        ingredient_summary[(match.group("name"), match.group("unit"))] += float(match.group("number") or 0)
 
         wrapping_div = _sectionize_from_heading(soup, step)
         _add_classes(wrapping_div, "step-container")
         desc_div = soup.new_tag("div", **{"class": ["step-description"]})
-        for el in ingredients.findNextSiblings(): # TODO: Ingredients is None
-            el.wrap(desc_div)
+        if ingredients is not None:
+            for el in ingredients.findNextSiblings():
+                el.wrap(desc_div)
+        else:
+            for el in step.contents:
+                el.wrap(desc_div)
+
 
     summary_tag = _build_summary(soup, ingredient_summary)
     steps.insert_before(summary_tag)
